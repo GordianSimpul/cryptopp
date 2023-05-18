@@ -3,7 +3,7 @@
 import requests
 
 
-CMC_API_KEY = 'd75c930e-a436-4149-a3ce-78440bf6a968'
+CMC_API_KEY = ''
 CMCQuote="https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?symbol=%s" 
 curr = "USD"
 headers_dict = {'X-CMC_PRO_API_KEY' : "%s" % CMC_API_KEY}
