@@ -1,0 +1,3 @@
+[console_scripts]
+cryptopp = cryptopp.cryptopp:main
+
