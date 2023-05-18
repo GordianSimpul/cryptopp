@@ -1,3 +1,16 @@
+Metadata-Version: 2.1
+Name: cryptopp
+Version: 1.0.2
+Summary: Command line Cryptocurrency Portfolio
+Home-page: https://github.com/GordianSimpul/cryptopp
+Author: GordianSimpul/huwwp
+Author-email: gordian@simpul.me
+License: GPLv3
+Keywords: crypto cli portfolio curses cryptocurrency bitcoin
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+License-File: LICENSE
+
 cryptopp
 ========
 cryptopp is a lightweight command line based cryptocurrency portfolio.
