@@ -14,7 +14,6 @@ from curses import KEY_F5
 import argparse
 import time
 from sys import stdout
-from apt_pkg import TIME
 
 # GLOBALS!
 BASEDIR = os.path.join(os.path.expanduser('~'), '.cryptop')

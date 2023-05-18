@@ -1,11 +1,11 @@
-cryptop
+cryptopp
 =======
-cryptop is a lightweight command line based cryptocurrency portfolio.
+cryptopp is a lightweight command line based cryptocurrency portfolio.
 Built on Python 3 and ncurses with simplicity in mind, cryptop updates in realtime.
 
 .. image:: img\cryptop.png
 
-version 1.0.0
+version 1.0.1
 
 Changes
 ------------
@@ -39,28 +39,28 @@ TODO
 Installation
 ------------
 
-cryptop requires Python 3 to run, and has only been tested in Python 3.6 so far.
+Via Pip
+
+.. code:: bash
+    pip3 install cryptopp
+
+Or locally:
+
+cryptop requires Python 3 to run, and has only been tested in Python 3.6-3.10 so far.
 
 First clone this repo
 
 .. code:: bash
 
-    git clone https://github.com/GordianSimpul/cryptop
+    git clone https://github.com/GordianSimpul/cryptopp
 
 Then install cryptop through pip
 
 .. code:: bash
 
-    cd cryptop
+    cd cryptopp
     pip3 install -e .
 
-cryptop can be installed manually, download the repo and run
-
-.. code:: bash
-
-    python setup.py install
-
-pip and setup.py can be run with a --user flag if you would prefer not to sudo. Both require setuptools which is included in most python installs and many distros by default
 
 Make sure $HOME/.local/bin is in your environment PATH variable. 
 
@@ -71,7 +71,7 @@ Start from a terminal.
 
 .. code:: bash
 
-    cryptop [-k api_key] [-l api_key]
+    cryptopp [-k api_key] [-l api_key]
 
 Follow the on screen instructions to add/remove or add/subtract values from your current wallet. The api_key options are only necessary if you didn't specify it in the .cryptop/config.ini file. An initial run is necessary to copy over config.ini to the .cryptop directory. 
 
