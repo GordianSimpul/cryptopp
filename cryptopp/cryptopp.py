@@ -74,7 +74,7 @@ def read_configuration(confpath):
 
 def get_coin_list():
     global CMC_API_KEY
-    cmc_coin_list_url = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/map?CMC_PRO_API_KEY=%s" % CMC_API_KEY
+    cmc_coin_list_url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?CMC_PRO_API_KEY=%s" % CMC_API_KEY
     
     def inner():
         coinJSON = requests.get(cmc_coin_list_url)
