@@ -8,7 +8,7 @@ with open('README.rst', encoding="utf-8") as f:
 
 setup(
     name='cryptopp',
-    version='1.0.3',
+    version='1.0.4',
     description='Command line Cryptocurrency Portfolio',
     long_description=readme,
     author='GordianSimpul/huwwp',

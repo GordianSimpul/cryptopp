@@ -14,6 +14,7 @@ from curses import KEY_F5
 import argparse
 import time
 from sys import stdout
+from copy import deepcopy
 
 # GLOBALS!
 BASEDIR = os.path.join(os.path.expanduser('~'), '.cryptop')
@@ -28,6 +29,7 @@ CRYPTOP_VERSION = 'cryptop v1.0.1'
 CCOMPARE_API_KEY = ''
 CMC_API_KEY = ''
 SPECIAL_CASES = ['BTSG', 'SHD']
+DUPLICATE_TICKERS = {'BEAM' : 'BEAMMW'}
 CMCQuote="https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?symbol=%s" 
 CMCPriceChange="https://pro-api.coinmarketcap.com/v1/cryptocurrency/price-performance-stats/latest?symbole=%s&CMC_PRO_API_KEY=%s"
 cmcqJSON = {} #CMC Quote, keep global so less requests to servers 
@@ -120,19 +122,35 @@ def get_price(coin, curr=None):
     cc_price_list = 'https://min-api.cryptocompare.com/data/pricemultifull?fsyms={}&tsyms={}&api_key=%s' % CCOMPARE_API_KEY
     price_matrix = []
     try:
+        for k,v in DUPLICATE_TICKERS.items():
+            if k in coin:
+                coin = coin.replace(k,v)
+                
         r = requests.get(cc_price_list.format(coin, curr))
-        cmcq_r = requests.get(CMCQuote % coin, headers=headers_dict)
         
+        for k,v in DUPLICATE_TICKERS.items():
+            if v in coin:
+                coin = coin.replace(v,k)
+        cmcq_r = requests.get(CMCQuote % coin, headers=headers_dict)
+
     except requests.exceptions.RequestException:
         return price_matrix
     
     try:
         data_raw = r.json()['RAW']
+        #print("=====================================================")
         global cmcqJSON
         cmcqJSON = cmcq_r.json()
+        #print(cmcqJSON)
         
         for c in coin.split(','):
+            for k,v in DUPLICATE_TICKERS.items():
+                if k == c:
+                    c = v;
             if c in SPECIAL_CASES:
+                #print(c)
+                #print("==============================================")
+                #print(float(cmcqJSON['data'][c.upper()][0]['quote'][curr]['price']))
                 price_matrix.append((float(cmcqJSON['data'][c.upper()][0]['quote'][curr]['price']),
                                      float(0.0), float(0.0)))
             elif c in data_raw.keys():
@@ -140,21 +158,39 @@ def get_price(coin, curr=None):
                  float(data_raw[c][curr]['HIGH24HOUR']),
                  float(data_raw[c][curr]['LOW24HOUR'])))
             else:
-                price_matrix.append((float(cmcqJSON['data'][c.upper()][0]['quote'][curr]['price']),
+                for k,v in DUPLICATE_TICKERS.items():
+                    if v == c:
+                        c = k;
+                price_matrix.append((float(cmcqJSON['data'][c.upper()][-1]['quote'][curr]['price']),
                                      float(0.0), float(0.0)))
         return price_matrix
     except Exception as e:
         sys.exit('Could not parse data: %s' % str(e))
-    
+        
+        
 def get_change(coin, curr="USD"):
     
     global cmcqJSON
     global CCOMPARE_API_KEY
     global CMC_API_KEY
+    global index
     coin_change_amt = {}
     cc_change_url = 'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=%s&tsyms=%s&api_key=%s' 
     curr = curr or CONFIG['api'].get('currency', 'USD')
     curr = curr.upper()
+    '''
+    print("HI")
+    for c in coin.split(','):
+        print(len(cmcqJSON['data'][c.upper()]))
+        if len(cmcqJSON['data'][c.upper()]) > 1:
+            id = 1000000
+            k=0
+            for dupcoin in cmcqJSON['data'][c.upper()]:
+                if int(dupcoin['id']) < id:
+                    id = int(cmcqJSON['data'][c.upper()][k]['id'])
+                    index = deepcopy(k)
+                k += 1
+    '''
     try:
         req = requests.get(cc_change_url % (coin, curr,CCOMPARE_API_KEY))
         hdata = req.json()
@@ -164,10 +200,16 @@ def get_change(coin, curr="USD"):
         return coin_change_amt
     
     for c in coin.split(','):
+        for key,value in DUPLICATE_TICKERS.items():
+            if c == key:
+                c = value
         if c in hdata['RAW'].keys():
             coin_change_amt[c] = round(float(hdata['RAW'][c][curr]["CHANGEPCT24HOUR"]),2)
-        else: 
-            coin_change_amt[c] = round(float(cmcqJSON['data'][c.upper()][0]['quote'][curr]["percent_change_24h"]),2)
+        else:
+            for key,value in DUPLICATE_TICKERS.items():
+                if c == value:
+                    c = key        
+            coin_change_amt[c] = round(float(cmcqJSON['data'][c.upper()][-1]['quote'][curr]["percent_change_24h"]),2)
         if coin_change_amt[c] > 0: 
             coin_change_amt[c] = '+' + str(coin_change_amt[c]) + "%"
         else:
@@ -265,7 +307,7 @@ def str_formatter(coin, val, held, change,mkcap):
 
 def write_scr(stdscr, wallet, y, x):
 
-
+    global index
     coin_distribution = {}
     char_distribution = {}
     charcar = '░'
@@ -307,8 +349,12 @@ def write_scr(stdscr, wallet, y, x):
             heldl = list(x[2] for x in s)
             for coin, val, held in zip(coinl, coinvl, heldl):
                 if coinl.index(coin) + 2 < y:
-                    stdscr.addnstr(coinl.index(coin) + 2, 0,
-                    str_formatter(coin, val, held,coinchg[coin],float(cmcqJSON['data'][coin.upper()][0]['quote']['USD']['market_cap'])), x, curses.color_pair(2))
+                    if coin.upper() == "BEAM":
+                        stdscr.addnstr(coinl.index(coin) + 2, 0,
+                        str_formatter(coin, val, held,coinchg[coin],float(cmcqJSON['data'][coin.upper()][-1]['quote']['USD']['market_cap'])), x, curses.color_pair(2))
+                    else:
+                        stdscr.addnstr(coinl.index(coin) + 2, 0,
+                        str_formatter(coin, val, held,coinchg[coin],float(cmcqJSON['data'][coin.upper()][0]['quote']['USD']['market_cap'])), x, curses.color_pair(2))
                 total += float(held) * val[0]
                 
         for coin, val, held in zip(coinl, coinvl, heldl):
