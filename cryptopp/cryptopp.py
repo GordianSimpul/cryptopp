@@ -281,9 +281,7 @@ def mkcap_format(mkcap):
         
     elif mkcaplen== 13:
         mkcap = mkcap[0] + '.' +  mkcap[1:3] + "T"
-            
-    else:
-        print(mkcap)
+
     return mkcap
             
     

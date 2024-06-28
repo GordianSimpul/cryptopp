@@ -3,9 +3,9 @@ cryptopp
 cryptopp is a lightweight command line based cryptocurrency portfolio.
 Built on Python 3 and ncurses with simplicity in mind, cryptop updates in realtime.
 
-.. image:: img\cryptop.png
+.. image:: img/cryptop.png
 
-version 1.0.1
+version 1.0.5
 
 Changes
 ------------
